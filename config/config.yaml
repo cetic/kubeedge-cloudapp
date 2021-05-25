@@ -1,0 +1,22 @@
+api:
+  url: "http://10.10.1.50:30723"
+
+log:
+  level: "Info"
+  formatter: "text"
+
+devices:
+  - "edge-dev-01"
+  - "edge-dev-02"
+
+triggering:
+  - condition: "hello"
+    action:
+      filename: "hello-loop.py"
+      url: ""
+  - condition: "me"
+    action:
+      filename: "me-loop.py"
+      url: ""
+
+polling: 2000
