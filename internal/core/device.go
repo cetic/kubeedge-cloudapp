@@ -5,24 +5,25 @@ import (
 	"CloudApp/internal/api"
 	"bytes"
 	"encoding/json"
-	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Device struct {
-	ID string
-	Value api.Response
+	ID          string
+	Value       api.Response
+	lastTrigger string
 }
 
 func (d *Device) UpdateValue() error {
 	client := http.Client{
 		Timeout: time.Duration(2 * time.Second),
 	}
-	log.Debug(config.Conf.Api.Url+"/api/v1/device/"+d.ID)
-	request, err := http.NewRequest("GET",config.Conf.Api.Url+"/api/v1/device/"+d.ID, nil)
+	log.Debug(config.Conf.Api.Url + "/api/v1/device/" + d.ID)
+	request, err := http.NewRequest("GET", config.Conf.Api.Url+"/api/v1/device/"+d.ID, nil)
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func (d *Device) UpdateValue() error {
 	defer rsp.Body.Close()
 	b, e := ioutil.ReadAll(rsp.Body)
 	log.Debug(string(b))
-	err = json.Unmarshal(b,&d.Value)
+	err = json.Unmarshal(b, &d.Value)
 	if err != nil {
 		return err
 	}
@@ -47,16 +48,15 @@ func (d *Device) UpdateValue() error {
 	return nil
 }
 
-
 func (d *Device) SetAction(input api.Update) error {
-	jsonMetering, err := json.Marshal(input)
+	jsonaction, err := json.Marshal(input)
 	if err != nil {
 		return err
 	}
 	client := http.Client{
 		Timeout: time.Duration(2 * time.Second),
 	}
-	request, err := http.NewRequest("POST", config.Conf.Api.Url+"/api/v1/device/"+d.ID, bytes.NewBuffer(jsonMetering))
+	request, err := http.NewRequest("POST", config.Conf.Api.Url+"/api/v1/device/"+d.ID, bytes.NewBuffer(jsonaction))
 	if err != nil {
 		return err
 	}
@@ -68,30 +68,22 @@ func (d *Device) SetAction(input api.Update) error {
 	if err != nil {
 		return err
 	}
-	if rsp.StatusCode != http.StatusNoContent {
-		defer rsp.Body.Close()
-		b, e := ioutil.ReadAll(rsp.Body)
-		if e != nil {
-			log.Error(e)
-		}
-		return fmt.Errorf("unable to post the metering %s: %s", rsp.Status, string(b))
-	}
 	log.Info(rsp.Body)
 	return nil
 }
 
 func (d *Device) Listen() {
 	for {
-		oldTrigger := d.Value.Trigger
-		log.Debugf("Old Trigger : %s",oldTrigger)
+		log.Debugf("Old Trigger : %s", d.lastTrigger)
 		e := d.UpdateValue()
 		if e != nil {
 			log.Error(e)
 		}
-		log.Debugf("Updated Trigger : %s",d.Value.Trigger)
+		log.Debugf("Updated Trigger : %s", d.Value.Trigger)
 		for _, trig := range config.Conf.Triggering {
-			if trig.Condition == d.Value.Trigger && oldTrigger == d.Value.Trigger {
+			if trig.Condition == d.Value.Trigger && d.lastTrigger != d.Value.Trigger {
 				log.Debug("Trigger Find")
+				d.lastTrigger = d.Value.Trigger
 				e = d.SetAction(trig.Action)
 				if e != nil {
 					log.Error(e)

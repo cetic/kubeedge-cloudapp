@@ -1,13 +1,12 @@
 api:
-  url: "http://10.10.1.50:30723"
+  url: "http://localhost:8090"
 
 log:
-  level: "Info"
+  level: "Debug"
   formatter: "text"
 
 devices:
-  - "edge-dev-01"
-  - "edge-dev-02"
+  - "edge-dev-tse-mac"
 
 triggering:
   - condition: "hello"

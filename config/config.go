@@ -1,43 +1,42 @@
 package config
 
-
 import (
 	"CloudApp/internal/api"
 	"flag"
-log "github.com/sirupsen/logrus"
-yaml "gopkg.in/yaml.v2"
-"io/ioutil"
-"os"
+	"io/ioutil"
+	"os"
 
+	log "github.com/sirupsen/logrus"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var Conf Config
 
 type Api struct {
-	Url      string `yaml:"url"`
+	Url string `yaml:"url"`
 }
 
 type Log struct {
-	LogLevels string  		`yaml:"level"`
-	LogFormatters string 	`yaml:"formatter"`
+	LogLevels     string `yaml:"level"`
+	LogFormatters string `yaml:"formatter"`
 }
 
 type Triggering struct {
-	Condition string  		`yaml:"condition"`
-	Action 	  api.Update 	`yaml:"action"`
+	Condition string     `yaml:"condition"`
+	Action    api.Update `yaml:"action"`
 }
 
 // config means all configurations used by the applications
 type Config struct {
-	Triggering  []Triggering 	`yaml:"triggering"`
-	Devices 	[]string 		`yaml:"devices"`
-	Api 		Api 			`yaml:"api"`
-	Log         Log 			`yaml:"log"`
-	Polling		int				`yaml:"polling"`
+	Triggering []Triggering `yaml:"triggering"`
+	Devices    []string     `yaml:"devices"`
+	Api        Api          `yaml:"api"`
+	Log        Log          `yaml:"log"`
+	Polling    int          `yaml:"polling"`
 }
 
 func Parse() {
-	configFile := flag.String("c", "../configs/config.yaml", "config file")
+	configFile := flag.String("c", "../config/config.yaml", "config file")
 	flag.Parse()
 	args := flag.Args()
 	myself := os.Args[0]
