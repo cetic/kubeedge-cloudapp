@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: kubeedge-demo
+data:
+  config.yaml: |
+    api:
+      url: "http://controller.kubeedge-demo.svc.cluster.local:8090"
+    log:
+      level: "Info"
+      formatter: "text"
+    devices:
+      - "edge-dev-demo-1"
+    triggering:
+      - condition: "hello"
+        action:
+          filename: "hello-loop.py"
+          url: ""
+      - condition: "me"
+        action:
+          filename: "me-loop.py"
+          url: ""
+    polling: 2000

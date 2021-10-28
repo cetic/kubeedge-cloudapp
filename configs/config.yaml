@@ -1,12 +1,12 @@
 api:
-  url: "http://localhost:8090"
+  url: "http://controller.kubeedge-demo.svc.cluster.local:8090"
 
 log:
-  level: "Debug"
+  level: "Info"
   formatter: "text"
 
 devices:
-  - "edge-dev-tse-mac"
+  - "edge-dev-demo-1"
 
 triggering:
   - condition: "hello"

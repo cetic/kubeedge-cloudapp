@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-app
+  namespace: kubeedge-demo
+  labels:
+    app: cloud-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: cloud-app
+  template:
+    metadata:
+      labels:
+        app: cloud-app
+    spec:
+      containers:
+        - name: cloud-app
+          image: ceticasbl/kubeedge-app:latest
+          ports:
+            - containerPort: 8090
+          volumeMounts:
+            - name: app-config
+              mountPath: "/app/configs"
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: app-config

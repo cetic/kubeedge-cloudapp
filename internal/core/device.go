@@ -1,7 +1,7 @@
 package core
 
 import (
-	"CloudApp/config"
+	config "CloudApp/configs"
 	"CloudApp/internal/api"
 	"bytes"
 	"encoding/json"
